@@ -80,7 +80,7 @@ export default function AdminDashboard() {
       } else {
         alert("Yükleme hatası: " + (data.error || "Bilinmiyor"));
       }
-    } catch (err) {
+    } catch {
       alert("Yükleme sırasında bir hata oluştu.");
     } finally {
       setUploading(false);
@@ -323,7 +323,7 @@ export default function AdminDashboard() {
                   <label className="block text-xs font-bold uppercase tracking-widest text-primary mb-3">Kategori</label>
                   <select
                     value={currentSite.category}
-                    onChange={(e) => setCurrentSite({...currentSite, category: e.target.value as any})}
+                    onChange={(e) => setCurrentSite({...currentSite, category: e.target.value})}
                     className="w-full bg-slate-800/50 border border-white/10 rounded-2xl py-4 px-6 text-white focus:border-primary transition-all outline-none"
                   >
                     <option value="Cultural">Kültürel</option>

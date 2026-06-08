@@ -1,4 +1,4 @@
-import { Compass, Shield, Globe, Award } from "lucide-react";
+import { Shield, Globe, Award } from "lucide-react";
 
 export default function AboutPage() {
   return (

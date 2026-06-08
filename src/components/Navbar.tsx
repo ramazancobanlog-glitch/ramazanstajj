@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { Compass, Menu, X } from "lucide-react";
+import { motion } from "framer-motion";
+import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export default function Navbar() {

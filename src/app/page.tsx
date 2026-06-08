@@ -3,8 +3,7 @@ import HeritageSite, { IHeritageSite } from "@/models/HeritageSite";
 export const dynamic = 'force-dynamic';
 import Hero from "@/components/Hero";
 import AnimatedQuote from "@/components/AnimatedQuote";
-import { MapPin, Calendar, ScrollText, ArrowRight, Compass } from "lucide-react";
-import Image from "next/image";
+import { MapPin, ArrowRight, Compass } from "lucide-react";
 import Link from "next/link";
 
 async function getHeritageSites() {
@@ -35,7 +34,7 @@ export default async function Home() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-          {sites.map((site, index) => (
+          {sites.map((site) => (
             <div key={site._id} className="premium-card rounded-[2rem] overflow-hidden group">
               <div className="relative h-80 overflow-hidden">
                 <img 

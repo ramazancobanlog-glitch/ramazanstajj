@@ -1,13 +1,7 @@
 import { NextResponse } from "next/server";
-import { v2 as cloudinary } from "cloudinary";
-
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
 export async function POST(req: Request) {
+
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File;
@@ -20,20 +14,18 @@ export async function POST(req: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Upload to Cloudinary
-    const result = await new Promise((resolve, reject) => {
-      cloudinary.uploader.upload_stream({
-        folder: "unesco_heritage",
-        resource_type: "auto"
-      }, (error, result) => {
-        if (error) reject(error);
-        else resolve(result);
-      }).end(buffer);
-    }) as any;
+    // Convert buffer to Base64 data URL
+    const base64String = buffer.toString("base64");
+    const mimeType = file.type || "image/jpeg";
+    const dataUrl = `data:${mimeType};base64,${base64String}`;
 
-    return NextResponse.json({ url: result.secure_url });
-  } catch (error: any) {
+    // Return the base64 URL
+    return NextResponse.json({ url: dataUrl });
+  } catch (error: unknown) {
     console.error("Upload error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
+
+

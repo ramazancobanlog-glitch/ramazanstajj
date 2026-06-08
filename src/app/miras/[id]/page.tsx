@@ -12,7 +12,7 @@ async function getSite(id: string) {
     const site = await HeritageSite.findById(id).lean();
     if (!site) return null;
     return JSON.parse(JSON.stringify(site)) as (IHeritageSite & { _id: string });
-  } catch (error) {
+  } catch {
     return null;
   }
 }

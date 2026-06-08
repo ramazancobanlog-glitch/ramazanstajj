@@ -7,8 +7,9 @@ export async function GET() {
     await dbConnect();
     const messages = await ContactMessage.find({}).sort({ createdAt: -1 });
     return NextResponse.json(messages);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 
@@ -20,7 +21,8 @@ export async function DELETE(req: Request) {
     if (!id) throw new Error("ID required");
     await ContactMessage.findByIdAndDelete(id);
     return NextResponse.json({ message: "Message deleted" });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
