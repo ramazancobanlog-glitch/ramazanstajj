@@ -34,5 +34,12 @@
 		// Enable image optimization
 		// see https://opennext.js.org/cloudflare/howtos/image
 		"binding": "IMAGES"
-	}
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "ramazan-staj-db",
+			"database_id": "2791ca87-ea3d-471e-baf5-06cd8a95205d"
+		}
+	]
 }

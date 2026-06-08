@@ -49,14 +49,18 @@ export default function AdminDashboard() {
 
   const fetchData = async () => {
     setLoading(true);
-    if (activeTab === "sites") {
-      const res = await fetch("/api/admin/heritage");
-      const data = await res.json();
-      setSites(data);
-    } else {
-      const res = await fetch("/api/admin/messages");
-      const data = await res.json();
-      setMessages(data);
+    try {
+      if (activeTab === "sites") {
+        const res = await fetch("/api/admin/heritage");
+        const data = await res.json() as Site[];
+        setSites(data);
+      } else {
+        const res = await fetch("/api/admin/messages");
+        const data = await res.json() as Message[];
+        setMessages(data);
+      }
+    } catch (error) {
+      console.error("Error fetching admin data:", error);
     }
     setLoading(false);
   };
@@ -74,7 +78,7 @@ export default function AdminDashboard() {
         method: "POST",
         body: formData,
       });
-      const data = await res.json();
+      const data = await res.json() as any;
       if (data.url) {
         setCurrentSite((prev: Partial<Site> | null) => prev ? { ...prev, imageUrl: data.url } : null);
       } else {

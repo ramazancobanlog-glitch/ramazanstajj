@@ -1,18 +1,31 @@
-import dbConnect from "@/lib/db";
-import HeritageSite, { IHeritageSite } from "@/models/HeritageSite";
+import getDB from "@/lib/db";
+
 import { MapPin, Calendar, ScrollText, ArrowLeft, Globe, Award, Shield } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 export const dynamic = 'force-dynamic';
 
-async function getSite(id: string) {
+interface IHeritageSite {
+  _id: string;
+  name: string;
+  description: string;
+  location: string;
+  country: string;
+  imageUrl: string;
+  category: 'Cultural' | 'Natural' | 'Mixed';
+  yearListed: number;
+}
+
+async function getSite(id: string): Promise<IHeritageSite | null> {
   try {
-    await dbConnect();
-    const site = await HeritageSite.findById(id).lean();
-    if (!site) return null;
-    return JSON.parse(JSON.stringify(site)) as (IHeritageSite & { _id: string });
-  } catch {
+    const db = getDB();
+    const site = await db.prepare(
+      "SELECT id as _id, name, description, location, country, image_url as imageUrl, category, year_listed as yearListed FROM heritage_sites WHERE id = ?"
+    ).bind(id).first<IHeritageSite>();
+    return site;
+  } catch (error) {
+    console.error("Error fetching site from D1:", error);
     return null;
   }
 }

@@ -1,53 +1,11 @@
-import mongoose from 'mongoose';
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 
-const MONGODB_URI = process.env.MONGODB_URI;
-
-/**
- * Global is used here to maintain a cached connection across hot reloads
- * in development. This prevents connections from growing exponentially
- * during API Route usage.
- */
-interface GlobalMongoose {
-  mongoose?: {
-    conn: typeof mongoose | null;
-    promise: Promise<typeof mongoose> | null;
-  };
+export function getDB() {
+  const { env } = getCloudflareContext();
+  if (!env || !env.DB) {
+    throw new Error("D1 Database binding 'DB' not found in Cloudflare context.");
+  }
+  return env.DB;
 }
 
-const globalWithMongoose = global as typeof globalThis & GlobalMongoose;
-
-if (!globalWithMongoose.mongoose) {
-  globalWithMongoose.mongoose = { conn: null, promise: null };
-}
-const cached = globalWithMongoose.mongoose;
-
-async function dbConnect() {
-  if (!MONGODB_URI) {
-    throw new Error('Please define the MONGODB_URI environment variable inside .env.local or Vercel dashboard');
-  }
-
-  if (cached.conn) {
-    return cached.conn;
-  }
-
-  if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-    };
-
-    cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
-      return mongoose;
-    });
-  }
-
-  try {
-    cached.conn = await cached.promise;
-  } catch (e) {
-    cached.promise = null;
-    throw e;
-  }
-
-  return cached.conn;
-}
-
-export default dbConnect;
+export default getDB;

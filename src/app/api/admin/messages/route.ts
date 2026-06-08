@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
-import dbConnect from "@/lib/db";
-import ContactMessage from "@/models/ContactMessage";
+import getDB from "@/lib/db";
 
 export async function GET() {
   try {
-    await dbConnect();
-    const messages = await ContactMessage.find({}).sort({ createdAt: -1 });
-    return NextResponse.json(messages);
+    const db = getDB();
+    const { results } = await db.prepare(
+      "SELECT id as _id, name, email, subject, message, created_at as createdAt FROM contact_messages ORDER BY created_at DESC"
+    ).all();
+    return NextResponse.json(results);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     return NextResponse.json({ error: errorMessage }, { status: 500 });
@@ -15,11 +16,11 @@ export async function GET() {
 
 export async function DELETE(req: Request) {
   try {
-    await dbConnect();
+    const db = getDB();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     if (!id) throw new Error("ID required");
-    await ContactMessage.findByIdAndDelete(id);
+    await db.prepare("DELETE FROM contact_messages WHERE id = ?").bind(id).run();
     return NextResponse.json({ message: "Message deleted" });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
