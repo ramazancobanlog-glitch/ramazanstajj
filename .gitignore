@@ -52,3 +52,9 @@ next-env.d.ts
 public/uploads/
 *.bak
 
+# Auto-generated Cloudflare type bindings (very large, regenerate with: npm run cf-typegen)
+cloudflare-env.d.ts
+
+# Misc
+.env.txt
+
