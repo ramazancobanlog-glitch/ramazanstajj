@@ -9,20 +9,33 @@ export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
-    // Simple auth check as requested
-    if (username === "ramazan" && password === "ramazan1627") {
-      // In a real app we'd use JWT/NextAuth, 
-      // but for this project scope we'll use a simple localStorage/cookie flag
-      localStorage.setItem("admin_auth", "true");
-      router.push("/admin");
-    } else {
-      setError("Hatalı kullanıcı adı veya şifre!");
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await res.json() as { ok: boolean; error?: string };
+
+      if (data.ok) {
+        localStorage.setItem("admin_auth", "true");
+        router.push("/admin");
+      } else {
+        setError(data.error ?? "Hatalı kullanıcı adı veya şifre!");
+      }
+    } catch {
+      setError("Sunucuya bağlanılamadı. Lütfen tekrar deneyin.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,7 +64,7 @@ export default function LoginPage() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full bg-slate-800/50 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:border-primary transition-all outline-none"
-                placeholder="ramazan"
+                placeholder="Kullanıcı adı"
                 required
               />
             </div>
@@ -72,17 +85,22 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {error && <p className="text-red-400 text-sm text-center font-medium bg-red-400/10 py-3 rounded-xl">{error}</p>}
+          {error && (
+            <p className="text-red-400 text-sm text-center font-medium bg-red-400/10 py-3 rounded-xl">
+              {error}
+            </p>
+          )}
 
           <button
             type="submit"
-            className="w-full bg-primary text-secondary font-bold py-4 rounded-2xl hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] transition-all transform active:scale-95 mb-2"
+            disabled={loading}
+            className="w-full bg-primary text-secondary font-bold py-4 rounded-2xl hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] transition-all transform active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
           >
-            Giriş Yap
+            {loading ? (
+              <span className="inline-block w-5 h-5 border-2 border-secondary/30 border-t-secondary rounded-full animate-spin" />
+            ) : null}
+            {loading ? "Giriş yapılıyor..." : "Giriş Yap"}
           </button>
-          <div className="text-center text-xs text-slate-500 mt-2">
-            Giriş Bilgileri: <span className="text-slate-300">ramazan</span> / <span className="text-slate-300">ramazan1627</span>
-          </div>
         </form>
       </motion.div>
     </div>
